@@ -1,0 +1,108 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum CustomerStatus {
+  NEW_LEAD
+  CONTACTED
+  INTERESTED
+  PROPOSAL_SENT
+  WON
+  LOST
+}
+
+enum CustomerSource {
+  WEBSITE
+  REFERRAL
+  INSTAGRAM
+  EMAIL
+  PHONE
+  WALK_IN
+  OTHER
+}
+
+enum ContactType {
+  CALL
+  EMAIL
+  MEETING
+  MESSAGE
+  OTHER
+}
+
+model User {
+  id           String   @id @default(uuid())
+  name         String
+  businessName String
+  email        String   @unique
+  passwordHash String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  customers       Customer[]
+  notes           Note[]
+  contactHistory  ContactHistory[]
+  reminders       Reminder[]
+}
+
+model Customer {
+  id        String         @id @default(uuid())
+  userId    String
+  firstName String
+  lastName  String
+  email     String?
+  phone     String?
+  company   String?
+  status    CustomerStatus @default(NEW_LEAD)
+  source    CustomerSource @default(OTHER)
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
+
+  user           User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  notes          Note[]
+  contactHistory ContactHistory[]
+  reminders      Reminder[]
+}
+
+model Note {
+  id         String   @id @default(uuid())
+  userId     String
+  customerId String
+  content    String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  customer Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+}
+
+model ContactHistory {
+  id          String      @id @default(uuid())
+  userId      String
+  customerId  String
+  type        ContactType
+  summary     String
+  outcome     String?
+  contactDate DateTime
+  createdAt   DateTime    @default(now())
+
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  customer Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+}
+
+model Reminder {
+  id         String   @id @default(uuid())
+  userId     String
+  customerId String
+  title      String
+  dueDate    DateTime
+  completed  Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  customer Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+}
