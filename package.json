@@ -1,0 +1,9 @@
+{
+  "name": "customer-relationship-management-system",
+  "version": "1.0.0",
+  "description": "A full-stack CRM system for small businesses.",
+  "private": true,
+  "scripts": {
+    "dev": "echo \"Run frontend and backend separately for now\""
+  }
+}
